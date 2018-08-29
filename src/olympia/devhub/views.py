@@ -1335,26 +1335,25 @@ def _submit_upload(request, addon, channel, next_view, version=None,
         data = form.cleaned_data
 
         if version:
-            for platform in data.get('supported_platforms', []):
-                File.from_upload(
-                    upload=data['upload'],
-                    version=version,
-                    platform=platform,
-                    parsed_data=data['parsed_data'])
+            File.from_upload(
+                upload=data['upload'],
+                version=version,
+                platform=amo.PLATFORM_ALL.id,
+                parsed_data=data['parsed_data'])
             url_args = [addon.slug, version.id]
         elif addon:
             version = Version.from_upload(
                 upload=data['upload'],
                 addon=addon,
-                platforms=data.get('supported_platforms', []),
+                selected_apps=data['compatible_apps'],
                 channel=channel,
                 parsed_data=data['parsed_data'])
             url_args = [addon.slug, version.id]
         else:
             addon = Addon.from_upload(
                 upload=data['upload'],
-                platforms=data.get('supported_platforms', []),
                 channel=channel,
+                selected_apps=data['compatible_apps'],
                 parsed_data=data['parsed_data'],
                 user=request.user)
             version = addon.find_latest_version(channel=channel)

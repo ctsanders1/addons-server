@@ -465,6 +465,21 @@ CompatFormSet = modelformset_factory(
     form=CompatForm, can_delete=True, extra=0)
 
 
+class CompatAppSelectWidget(forms.CheckboxSelectMultiple):
+    option_template_name = 'devhub/forms/widgets/compat_app_input_option.html'
+
+    def create_option(self, name, value, label, selected, index, subindex=None,
+                      attrs=None):
+        data = super(CompatAppSelectWidget, self).create_option(
+            name=name, value=value, label=label, selected=selected,
+            index=index, subindex=subindex, attrs=attrs)
+
+        # Inject the short application name for easier styling
+        data['compat_app_short'] = amo.APPS_ALL[int(data['value'])].short
+
+        return data
+
+
 class NewUploadForm(forms.Form):
     upload = forms.ModelChoiceField(
         widget=forms.HiddenInput,
@@ -477,13 +492,14 @@ class NewUploadForm(forms.Form):
     )
     admin_override_validation = forms.BooleanField(
         required=False, label=_(u'Override failed validation'))
-    supported_platforms = forms.TypedMultipleChoiceField(
-        choices=amo.SUPPORTED_PLATFORMS_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'platform'}),
-        initial=[amo.PLATFORM_ALL.id],
+    compatible_apps = forms.TypedMultipleChoiceField(
+        choices=amo.APPS_FIREFOXES_ONLY_CHOICES,
+        # Pre-select all valid choices, by default WebExtensions
+        # should be compatible with Firefox and Firefox for Android
+        initial=[x[0] for x in amo.APPS_FIREFOXES_ONLY_CHOICES],
         coerce=int,
-        error_messages={'required': 'Need at least one platform.'}
-    )
+        widget=CompatAppSelectWidget(),
+        error_messages={'required': 'Need to select at least one app.'})
 
     def __init__(self, *args, **kw):
         self.request = kw.pop('request')
@@ -491,20 +507,14 @@ class NewUploadForm(forms.Form):
         self.version = kw.pop('version', None)
         super(NewUploadForm, self).__init__(*args, **kw)
 
-        # If we have a version reset platform choices to just those compatible.
+        # If we have a version, pre-select the ones from the previous
+        # version to help the developer decide.
         if self.version:
-            platforms = self.fields['supported_platforms']
-            compat_platforms = self.version.compatible_platforms().values()
-            platforms.choices = sorted(
-                (p.id, p.name) for p in compat_platforms)
-            # Don't allow platforms we already have.
-            to_exclude = set(File.objects.filter(version=self.version)
-                                         .values_list('platform', flat=True))
-            # Don't allow platform=ALL if we already have platform files.
-            if to_exclude:
-                to_exclude.add(amo.PLATFORM_ALL.id)
-                platforms.choices = [p for p in platforms.choices
-                                     if p[0] not in to_exclude]
+            compatible_apps = self.version.compatible_apps().values()
+            # Just iterate through initial choices to keep the sorting
+            self.fields['compatible_apps'].choices = tuple(
+                (amo.APPS_ALL[app].id, amo.APPS_ALL[app].pretty)
+                for app in compatible_apps)
 
     def _clean_upload(self):
         if not (self.cleaned_data['upload'].valid or
