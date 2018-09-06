@@ -499,7 +499,7 @@ class NewUploadForm(forms.Form):
         initial=[x[0] for x in amo.APPS_FIREFOXES_ONLY_CHOICES],
         coerce=int,
         widget=CompatAppSelectWidget(),
-        error_messages={'required': 'Need to select at least one app.'})
+        error_messages={'required': _('Need to select at least one app.')})
 
     def __init__(self, *args, **kw):
         self.request = kw.pop('request')
@@ -510,10 +510,10 @@ class NewUploadForm(forms.Form):
         # If we have a version, pre-select the ones from the previous
         # version to help the developer decide.
         if self.version:
-            compatible_apps = self.version.compatible_apps().values()
+            compatible_apps = self.version.compatible_apps.keys()
             # Just iterate through initial choices to keep the sorting
             self.fields['compatible_apps'].choices = tuple(
-                (amo.APPS_ALL[app].id, amo.APPS_ALL[app].pretty)
+                (amo.APPS_ALL[app.id].id, amo.APPS_ALL[app.id].pretty)
                 for app in compatible_apps)
 
     def _clean_upload(self):

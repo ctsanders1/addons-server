@@ -611,6 +611,7 @@ class Addon(OnChangeMixin, ModelBase):
         if upload.validation_timeout:
             AddonReviewerFlags.objects.update_or_create(
                 addon=addon, defaults={'needs_admin_code_review': True})
+
         Version.from_upload(
             upload=upload, addon=addon, selected_apps=selected_apps,
             channel=channel, parsed_data=parsed_data)
