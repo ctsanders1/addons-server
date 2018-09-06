@@ -33,7 +33,7 @@ class TestNewUploadForm(TestCase):
     def test_only_valid_uploads(self):
         upload = FileUpload.objects.create(valid=False)
         form = forms.NewUploadForm(
-            {'upload': upload.uuid, 'supported_platforms': [1]},
+            {'upload': upload.uuid, 'compatible_apps': [amo.FIREFOX.id]},
             request=mock.Mock())
         assert ('There was an error with your upload. Please try again.' in
                 form.errors.get('__all__')), form.errors
@@ -43,7 +43,7 @@ class TestNewUploadForm(TestCase):
             # For the 'Addons:Edit' permission check.
             acl.return_value = True
             form = forms.NewUploadForm(
-                {'upload': upload.uuid, 'supported_platforms': [1],
+                {'upload': upload.uuid, 'compatible_apps': [amo.FIREFOX.id],
                     'admin_override_validation': True},
                 request=mock.Mock())
             assert ('There was an error with your upload. Please try' not in
@@ -53,7 +53,7 @@ class TestNewUploadForm(TestCase):
         upload.save()
         addon = Addon.objects.create()
         form = forms.NewUploadForm(
-            {'upload': upload.uuid, 'supported_platforms': [1]},
+            {'upload': upload.uuid, 'compatible_apps': [amo.FIREFOX.id]},
             addon=addon, request=mock.Mock())
         assert ('There was an error with your upload. Please try again.' not in
                 form.errors.get('__all__')), form.errors
@@ -77,7 +77,7 @@ class TestNewUploadForm(TestCase):
         upload = FileUpload.objects.create(valid=True)
         addon = Addon.objects.create()
         form = forms.NewUploadForm(
-            {'upload': upload.uuid, 'supported_platforms': [1]},
+            {'upload': upload.uuid, 'compatible_apps': [amo.FIREFOX.id]},
             addon=addon, request=mock.Mock())
         form.clean()
         assert mock_check_xpi_info.called
