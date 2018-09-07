@@ -138,11 +138,6 @@ $(document).ready(function() {
 
     $(".invisible-upload a").click(_pd(function() {}));
 
-    // Choosing platform when submitting an Addon and/or files.
-    if ($('input.platform').length) {
-        initPlatformChooser();
-    }
-
     // when to start and stop image polling
     if ($('#edit-addon-media').length &&
         $('#edit-addon-media').attr('data-checkurl') !== undefined) {
@@ -227,30 +222,6 @@ $(document).ready(function() {
         $(this).find('button').addClass('disabled');
     });
 });
-
-function initPlatformChooser() {
-    $(document).on('change', 'input.platform', function(e) {
-        var form = $(this).parents('form'),
-            platform = false,
-            parent = form,
-            val = $(this).val(),
-            container = $(this).parents('div:eq(0)');
-        if (val == '1') {
-            // Platform=ALL
-            if ($(this).prop('checked')) {
-                // Uncheck all other platforms:
-                $(format('input.platform:not([value="{0}"])', val),
-                  parent).prop('checked', false);
-            }
-        } else {
-            if ($(this).prop('checked')) {
-                // Any other platform was checked so uncheck Platform=ALL
-                $('input.platform[value="1"]',
-                  parent).prop('checked', false);
-            }
-        }
-    });
-}
 
 $(document).ready(function() {
     $.ajaxSetup({cache: false});

@@ -743,18 +743,6 @@ def json_upload_detail(request, upload, addon_slug=None):
             if not errors_before:
                 return json_view.error(result)
         else:
-            app_ids = set([a.id for a in pkg.get('apps', [])])
-            supported_platforms = []
-            if amo.ANDROID.id in app_ids:
-                supported_platforms.extend((amo.PLATFORM_ANDROID.id,))
-                app_ids.remove(amo.ANDROID.id)
-            if len(app_ids):
-                # Targets any other non-mobile app:
-                supported_platforms.extend(amo.DESKTOP_PLATFORMS.keys())
-            plat_exclude = (
-                set(amo.SUPPORTED_PLATFORMS.keys()) - set(supported_platforms))
-            plat_exclude = [str(p) for p in plat_exclude]
-
             result['addon_type'] = pkg.get('type', '')
 
     result['platforms_to_exclude'] = plat_exclude

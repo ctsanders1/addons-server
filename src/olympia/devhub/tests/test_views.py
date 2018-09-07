@@ -1061,17 +1061,6 @@ class TestUploadDetail(BaseUploadTest):
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @mock.patch('olympia.devhub.tasks.run_validator')
-    def check_excluded_platforms(self, xpi, platforms, v):
-        v.return_value = json.dumps(self.validation_ok())
-        self.upload_file(xpi)
-        upload = FileUpload.objects.get()
-        response = self.client.get(
-            reverse('devhub.upload_detail', args=[upload.uuid.hex, 'json']))
-        assert response.status_code == 200
-        data = json.loads(response.content)
-        assert sorted(data['platforms_to_exclude']) == sorted(platforms)
-
     def test_multi_app_addon_can_have_all_platforms(self):
         self.check_excluded_platforms('mobile-2.9.10-fx+fn.xpi', [])
 
