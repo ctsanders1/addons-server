@@ -30,6 +30,12 @@ from olympia.versions.models import ApplicationsVersions, License
 
 class TestNewUploadForm(TestCase):
 
+    def test_firefox_default_selected(self):
+        upload = FileUpload.objects.create(valid=False)
+        form = forms.NewUploadForm(
+            {'upload': upload.uuid}, request=mock.Mock())
+        assert form.fields['compatible_apps'].initial == [amo.FIREFOX.id]
+
     def test_only_valid_uploads(self):
         upload = FileUpload.objects.create(valid=False)
         form = forms.NewUploadForm(

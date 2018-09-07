@@ -494,9 +494,10 @@ class NewUploadForm(forms.Form):
         required=False, label=_(u'Override failed validation'))
     compatible_apps = forms.TypedMultipleChoiceField(
         choices=amo.APPS_FIREFOXES_ONLY_CHOICES,
-        # Pre-select all valid choices, by default WebExtensions
-        # should be compatible with Firefox and Firefox for Android
-        initial=[x[0] for x in amo.APPS_FIREFOXES_ONLY_CHOICES],
+        # Pre-select only Desktop Firefox, most of the times developers
+        # don't develop their WebExtensions for Android.
+        # See this GitHub comment: https://bit.ly/2QaMicU
+        initial=[amo.FIREFOX.id],
         coerce=int,
         widget=CompatAppSelectWidget(),
         error_messages={'required': _('Need to select at least one app.')})
