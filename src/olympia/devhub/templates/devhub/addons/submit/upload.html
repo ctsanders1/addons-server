@@ -52,7 +52,7 @@
 
   {{ new_addon_form.non_field_errors() }}
 
-    <div class="compatible-apps{% if not new_addon_form.compatible_apps.errors %} {% endif %}">
+    <div class="compatible-apps">
       <label>{{ _('Which application is this version compatible with?') }}</label>
       {{ new_addon_form.compatible_apps.errors }}
       {{ new_addon_form.compatible_apps }}

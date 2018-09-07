@@ -718,7 +718,6 @@ def json_upload_detail(request, upload, addon_slug=None):
     if addon_slug:
         addon = get_object_or_404(Addon.objects, slug=addon_slug)
     result = upload_validation_context(request, upload, addon=addon)
-    plat_exclude = []
     if result['validation']:
         try:
             pkg = parse_addon(upload, addon=addon, user=request.user)
@@ -744,8 +743,6 @@ def json_upload_detail(request, upload, addon_slug=None):
                 return json_view.error(result)
         else:
             result['addon_type'] = pkg.get('type', '')
-
-    result['platforms_to_exclude'] = plat_exclude
     return result
 
 
