@@ -508,8 +508,8 @@ class NewUploadForm(forms.Form):
         self.version = kw.pop('version', None)
         super(NewUploadForm, self).__init__(*args, **kw)
 
-        # If we have a version, pre-select the ones from the previous
-        # version to help the developer decide.
+        # If we have a version, pre-select the ones from the current version
+        # to help the developer decide.
         if self.version:
             compatible_apps = self.version.compatible_apps.keys()
             # Just iterate through initial choices to keep the sorting

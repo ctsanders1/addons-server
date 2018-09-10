@@ -721,6 +721,8 @@ def migrate_legacy_dictionary_to_webextension(addon):
 
     parsed_data = parse_addon(upload, user=user)
     # Create version.
+    # WebExtension dictionaries are only compatible with Firefox
+    # Firefox for Android uses the OS spellchecking.
     version = Version.from_upload(
         upload, addon, selected_apps=[amo.FIREFOX.id],
         channel=amo.RELEASE_CHANNEL_LISTED, parsed_data=parsed_data)
